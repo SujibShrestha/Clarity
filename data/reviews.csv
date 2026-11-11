@@ -1,0 +1,61 @@
+review_id,product_id,text,rating,review_date
+1,9,Absolutely love it. Exceeded my expectations.,5,2025-01-12
+2,10,It's okay. Nothing special but gets the job done.,3,2025-01-20
+3,4,Stopped working properly after a few weeks.,2,2025-02-02
+4,10,"Mixed feelings. Some features are great, others disappointing.",3,2025-02-14
+5,7,"Very good overall, with just a few minor flaws.",4,2025-02-25
+6,11,Average quality. Decent for the price but not outstanding.,3,2025-02-27
+7,2,Excellent quality and great value for the price.,5,2025-03-12
+8,10,It's okay. Nothing special but gets the job done.,3,2025-03-13
+9,4,Best purchase I've made this year. Highly recommend!,5,2025-03-19
+10,12,Best purchase I've made this year. Highly recommend!,5,2025-03-31
+11,14,"Mixed feelings. Some features are great, others disappointing.",3,2025-04-14
+12,4,Disappointed. Several features didn't work as advertised.,2,2025-04-15
+13,2,Excellent quality and great value for the price.,5,2025-04-23
+14,6,"Mixed feelings. Some features are great, others disappointing.",3,2025-05-22
+15,2,"Mixed feelings. Some features are great, others disappointing.",3,2025-06-11
+16,3,"Very good overall, with just a few minor flaws.",4,2025-06-15
+17,4,Works perfectly and arrived earlier than expected.,5,2025-07-25
+18,1,Terrible. Broke within days and support was unhelpful.,1,2025-08-12
+19,1,Excellent quality and great value for the price.,5,2025-09-27
+20,6,"Very good overall, with just a few minor flaws.",4,2025-10-01
+21,11,Works perfectly and arrived earlier than expected.,5,2025-10-01
+22,3,"Solid product. Does what it says, though setup took a while.",4,2025-10-04
+23,11,Not as described. The build feels cheaper than the photos suggest.,2,2025-10-09
+24,4,"Very good overall, with just a few minor flaws.",4,2025-10-12
+25,2,Good quality and comfortable to use.,4,2025-10-13
+26,3,Good quality and comfortable to use.,4,2025-10-13
+27,11,It's okay. Nothing special but gets the job done.,3,2025-10-24
+28,15,"Solid product. Does what it says, though setup took a while.",4,2025-11-11
+29,14,Complete waste of money. Would not recommend.,1,2025-11-20
+30,5,It's okay. Nothing special but gets the job done.,3,2025-12-11
+31,4,It's okay. Nothing special but gets the job done.,3,2025-12-13
+32,1,"Very good overall, with just a few minor flaws.",4,2025-12-14
+33,2,Happy with it. Would buy again if the price drops.,4,2026-01-03
+34,5,"Solid product. Does what it says, though setup took a while.",4,2026-01-09
+35,9,Not as described. The build feels cheaper than the photos suggest.,2,2026-01-23
+36,4,Excellent quality and great value for the price.,5,2026-02-21
+37,13,Works perfectly and arrived earlier than expected.,5,2026-03-09
+38,11,It's okay. Nothing special but gets the job done.,3,2026-03-09
+39,5,Best purchase I've made this year. Highly recommend!,5,2026-03-15
+40,2,Stopped working properly after a few weeks.,2,2026-03-18
+41,8,Absolutely love it. Exceeded my expectations.,5,2026-04-08
+42,15,Excellent quality and great value for the price.,5,2026-04-15
+43,7,Happy with it. Would buy again if the price drops.,4,2026-04-25
+44,6,"Mixed feelings. Some features are great, others disappointing.",3,2026-05-27
+45,10,"Solid product. Does what it says, though setup took a while.",4,2026-07-01
+46,4,"Mixed feelings. Some features are great, others disappointing.",3,2026-07-04
+47,12,Good quality and comfortable to use.,4,2026-07-13
+48,3,Excellent quality and great value for the price.,5,2026-07-17
+49,9,"Solid product. Does what it says, though setup took a while.",4,2026-07-29
+50,5,Disappointed. Several features didn't work as advertised.,2,2026-07-29
+51,5,Disappointed. Several features didn't work as advertised.,2,2026-08-04
+52,1,It's okay. Nothing special but gets the job done.,3,2026-08-04
+53,4,Good quality and comfortable to use.,4,2026-08-08
+54,10,"Solid product. Does what it says, though setup took a while.",4,2026-08-26
+55,5,Good quality and comfortable to use.,4,2026-09-14
+56,14,"Solid product. Does what it says, though setup took a while.",4,2026-09-16
+57,9,Works perfectly and arrived earlier than expected.,5,2026-10-03
+58,9,"Works fine, but the instructions were confusing.",3,2026-10-06
+59,1,Not as described. The build feels cheaper than the photos suggest.,2,2026-10-09
+60,7,Works perfectly and arrived earlier than expected.,5,2026-10-28

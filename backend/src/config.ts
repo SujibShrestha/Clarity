@@ -12,6 +12,11 @@ loadEnv({ path: path.join(backendDir, ".env") });
 
 const envSchema = z.object({
   PORT: z.coerce.number().default(8000),
+  DATABRICKS_TOKEN: z.string().min(1),
+  DATABRICKS_HTTP_PATH: z.string(),
+  DATABRICKS_HOST: z.url(),
+  DATABRICKS_SERVER_HOSTNAME: z.string(),
+  DATABASE_CATALOG: z.string().default("clarity"),
 });
 
 export const env = envSchema.parse(process.env);
