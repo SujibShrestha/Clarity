@@ -12,8 +12,8 @@ app.use(express.json());
 //ROUTES
 
 
-app.use("/health", healthRouter);
-app.use("/products",productsRouter);
+app.use("/api/health", healthRouter);
+app.use("/api/products",productsRouter);
 
 app.get("/", (req: Request, res: Response) => {
   return res.status(200).json({

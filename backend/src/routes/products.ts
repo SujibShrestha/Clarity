@@ -1,15 +1,16 @@
 import { Router } from "express";
 import { queryDatabricks } from "../databricks/sql.js";
 import { env } from "../config.js";
+import { computeHealthStatus, healthLabel } from "../health/rules.js";
 
 const CATALOG = env.DATABASE_CATALOG;
 
 export const productsRouter = Router();
 
 type MetricsRow = {
-    review_count: number|null;
-    average_rating: number | null;
-    negative_review_count: number  | null;
+    review_count: number | null;
+    avg_rating: number | null;
+    negative_pct: number | null;
 }
 
 type ProductListRow = MetricsRow & {
@@ -17,6 +18,24 @@ type ProductListRow = MetricsRow & {
     name: string | null;
     category: string | null ;
     top_complaint: string | null;
+}
+
+
+
+function buildProductMetrics(row:MetricsRow | undefined){
+ const productMetrics = {
+  reviewCount : Number(row?.review_count ?? 0),
+  avgRating : row?.avg_rating == null ? null : Number(row.avg_rating),
+  negativePct : row?.negative_pct == null ? null : Number(row.negative_pct)
+ }
+
+ const healthStatus = computeHealthStatus(productMetrics)
+
+ return {
+  metrics: productMetrics,
+  health :{ status: healthStatus , label: healthLabel(healthStatus) }
+
+ }
 }
 
 const METRICS_SUBQUERY = `
@@ -57,7 +76,9 @@ productsRouter.get("/", async (_req, res) => {
             
             `);
 
-   res.status(200).json({ products });
+   res.status(200).json({
+      products: products.map((row) => ({ ...row, ...buildProductMetrics(row) })),
+    });
 
     } catch (error) {
         const message =
