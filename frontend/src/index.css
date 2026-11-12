@@ -118,11 +118,10 @@
 }
 
 #root {
-  width: 1126px;
+  width: 1180px;
   max-width: 100%;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  padding: 0 20px 64px;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -261,3 +260,72 @@ code {
     @apply bg-background text-foreground;}
   html {
     @apply font-mono;}}
+
+/* ===== Neo-brutalism theme ===== */
+
+@theme {
+  --color-ink: #111111;
+  --color-brutal-yellow: #ffe503;
+  --color-brutal-blue: #5ecdf7;
+  --color-brutal-pink: #ff5ebd;
+  --color-brutal-green: #7dff9b;
+  --color-brutal-red: #ff5f56;
+  --shadow-brutal: 4px 4px 0 0 #111111;
+  --shadow-brutal-lg: 7px 7px 0 0 #111111;
+}
+
+/* Forced light palette so hard black shadows never sit on a dark bg */
+:root {
+  --bg: #fffdf2;
+  --text: #111111;
+  --text-h: #111111;
+  --code-bg: #ffe503;
+  --border: #111111;
+  --background: #fffdf2;
+  --foreground: #111111;
+  --card: #ffffff;
+  --card-foreground: #111111;
+  --primary: #ffe503;
+  --primary-foreground: #111111;
+  --secondary: #5ecdf7;
+  --secondary-foreground: #111111;
+  --muted: #efece0;
+  --muted-foreground: #4b4b4b;
+  --accent: #ff5ebd;
+  --accent-foreground: #111111;
+  --input: #111111;
+  --ring: #111111;
+  --radius: 0;
+  color-scheme: light;
+}
+
+h1,
+h2 {
+  font-family: var(--mono);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  color: var(--text-h);
+}
+
+/* Chunky borders + hard offset shadow; press-down on interaction */
+.brutal {
+  border: 3px solid #111111;
+  box-shadow: var(--shadow-brutal);
+}
+
+.brutal-press {
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.brutal-press:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-brutal-lg);
+}
+
+.brutal-press:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0 0 0 0 #111111;
+}
