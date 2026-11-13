@@ -17,6 +17,7 @@ const envSchema = z.object({
   DATABRICKS_HOST: z.url(),
   DATABRICKS_SERVER_HOSTNAME: z.string(),
   DATABASE_CATALOG: z.string().default("clarity"),
+  DATABASE_URL: z.string().url(),
 });
 
 export const env = envSchema.parse(process.env);
