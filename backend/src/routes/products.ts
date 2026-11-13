@@ -87,3 +87,116 @@ productsRouter.get("/", async (_req, res) => {
     }
 
 })
+
+productsRouter.get("/:productId", async (req, res) => {
+  const { productId } = req.params;
+  try {
+      const [productRows, metricsRows, categoryRows, sentimentRows,worstNegativeReview ,bestPositiveReview] = await Promise.all([
+        queryDatabricks(`
+          SELECT product_id, name, category
+          FROM ${CATALOG}.core.products 
+          WHERE product_id = '${productId}'
+          `),
+        queryDatabricks<MetricsRow>(`
+          SELECT review_count, avg_rating, negative_pct
+          FROM (${METRICS_SUBQUERY}) metrics
+          WHERE metrics.product_id = '${productId}'
+          `),
+          queryDatabricks(`
+          SELECT enriched.complaint_category, COUNT(*) AS complaint_count
+          FROM ${CATALOG}.core.enriched_reviews enriched
+          WHERE enriched.product_id = '${productId}' 
+          AND enriched.complaint_category IS NOT NULL
+          GROUP BY enriched.complaint_category
+          ORDER BY complaint_count DESC
+          
+          `),
+          queryDatabricks(`
+          SELECT enriched.sentiment, COUNT(*) AS sentiment_count
+          FROM ${CATALOG}.core.enriched_reviews enriched
+          WHERE enriched.product_id = '${productId}' 
+          AND enriched.sentiment IS NOT NULL
+          GROUP BY enriched.sentiment
+          ORDER BY sentiment_count DESC
+          `),
+          queryDatabricks(`
+          SELECT review.review_id, review.rating, review.text, enriched.sentiment, enriched.complaint_category
+          FROM ${CATALOG}.core.reviews review
+          JOIN ${CATALOG}.core.enriched_reviews enriched ON review.review_id = enriched.review_id
+          WHERE enriched.product_id = '${productId}' 
+          AND enriched.sentiment = 'negative' 
+          ORDER BY review.rating ASC
+          LIMIT 1
+          `),
+          queryDatabricks(`
+          SELECT review.review_id, review.rating, review.text, enriched.sentiment, enriched.complaint_category
+          FROM ${CATALOG}.core.reviews review
+          JOIN ${CATALOG}.core.enriched_reviews enriched ON review.review_id = enriched.review_id
+          WHERE enriched.product_id = '${productId}' 
+          AND enriched.sentiment = 'positive'
+          ORDER BY review.rating DESC
+          LIMIT 1
+          `),
+      ]
+    
+
+    );
+
+    const productRow = productRows[0];
+    if (!productRow) {
+      res.status(404).json({ error: "Product not found" });
+      return;
+    }
+    const {metrics, health} = buildProductMetrics(metricsRows[0]);
+     const highlightReviewRow =
+     health.status === "healthy" ? bestPositiveReview[0] : worstNegativeReview[0];
+
+     res.json({
+      productId : productRow.product_id,
+      name : productRow.name,
+      category : productRow.category,
+      metrics,
+      health,
+      highlightReview:highlightReviewRow?{
+        text:highlightReviewRow.text,
+        rating:highlightReviewRow.rating,
+        sentiment:highlightReviewRow.sentiment,
+      }:null,
+      topComplaint  : categoryRows[0]?
+      parseComplaintCategory(categoryRows[0].complain_category)??
+      categoryRows[0].complaint_category : null,
+      topCategories:categoryRows.map((c)=>({
+        category : parseComplaintCategory(c,c.complain_category),
+        count : Number(c.complaint_count)
+      })),
+
+      sentimentBreakDown: sentimentRows.map((sentiment)=>({
+        sentiment: sentiment.sentiment,
+        count:Number(sentiment.sentiment_count)
+      }))
+     })
+
+    }catch(error){
+      const message =
+      error instanceof Error ? error.message : "Failed to load product";
+    res.status(500).json({ error: message });
+    }
+  })
+
+function parseComplaintCategory(
+  value: unknown,
+  fallback?: unknown,
+): string | null {
+  const candidate =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>).complaint_category ??
+        (value as Record<string, unknown>).complain_category
+      : value ?? fallback;
+
+  if (typeof candidate !== "string") {
+    return candidate == null ? null : String(candidate);
+  }
+
+  const category = candidate.trim();
+  return category.length > 0 ? category : null;
+}
