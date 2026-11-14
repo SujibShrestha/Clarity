@@ -7,7 +7,7 @@ import {
 } from "@phosphor-icons/react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { Skeleton } from "../components/ui/skeleton";
+import { DetailLoading } from "../components/detail-loading";
 import { Stat } from "../components/product-card";
 import {
   putProductFlag,
@@ -266,20 +266,7 @@ export function ProductDetailPage() {
   if (state.status === "loading") {
     return (
       <main className="flex flex-col gap-6 pt-10">
-        <div className="brutal bg-card p-5">
-          <Skeleton className="mb-3 h-4 w-32" />
-          <Skeleton className="mb-3 h-9 w-2/3" />
-          <Skeleton className="h-6 w-40" />
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-          <Skeleton className="h-20" />
-        </div>
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Skeleton className="brutal h-40 bg-card" />
-          <Skeleton className="brutal h-40 bg-card" />
-        </div>
+        <DetailLoading />
       </main>
     );
   }
