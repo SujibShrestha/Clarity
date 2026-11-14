@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Badge } from "./ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
 
@@ -12,6 +13,7 @@ export type Product = {
   name: string | null;
   category: string | null;
   top_complaint: string | null;
+  flagged: boolean;
   metrics: {
     reviewCount: number;
     avgRating: number | null;
@@ -27,7 +29,7 @@ const healthStyles: Record<HealthStatus, string> = {
   insufficient_data: "bg-brutal-blue",
 };
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+export function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="border-2 border-ink bg-muted px-1 py-2 text-center">
       <div className="text-[10px] font-bold tracking-wider uppercase">
@@ -48,11 +50,18 @@ export function ProductCard({ product }: { product: Product }) {
           <CardTitle className="text-base leading-snug font-extrabold break-words uppercase">
             {product.name ?? "Unnamed product"}
           </CardTitle>
-          <Badge
-            className={`${healthStyles[health.status]} shrink-0 border-2 border-ink px-2 py-0.5 text-[11px] font-bold tracking-wide text-foreground uppercase shadow-[2px_2px_0_0_#111]`}
-          >
-            {health.label}
-          </Badge>
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            {product.flagged && (
+              <Badge className="border-2 border-ink bg-brutal-yellow px-2 py-0.5 text-[10px] font-black tracking-wide text-foreground uppercase shadow-[2px_2px_0_0_#111]">
+                Flagged
+              </Badge>
+            )}
+            <Badge
+              className={`${healthStyles[health.status]} shrink-0 border-2 border-ink px-2 py-0.5 text-[11px] font-bold tracking-wide text-foreground uppercase shadow-[2px_2px_0_0_#111]`}
+            >
+              {health.label}
+            </Badge>
+          </div>
         </div>
         {product.category && (
           <Badge
@@ -78,20 +87,28 @@ export function ProductCard({ product }: { product: Product }) {
         </div>
       </CardContent>
 
-      <CardFooter className="flex-wrap items-center gap-1.5 border-t-[3px] border-ink pt-3">
-        <span className="text-[10px] font-bold tracking-wider uppercase">
-          Top complaint:
-        </span>
-        {product.top_complaint ? (
-          <Badge
-            variant="outline"
-            className="border-2 border-ink bg-brutal-yellow px-2 font-bold text-foreground uppercase"
-          >
-            {product.top_complaint}
-          </Badge>
-        ) : (
-          <span className="text-xs text-muted-foreground">none</span>
-        )}
+      <CardFooter className="flex-wrap items-center justify-between gap-2 border-t-[3px] border-ink pt-3">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] font-bold tracking-wider uppercase">
+            Top complaint:
+          </span>
+          {product.top_complaint ? (
+            <Badge
+              variant="outline"
+              className="border-2 border-ink bg-brutal-yellow px-2 font-bold text-foreground uppercase"
+            >
+              {product.top_complaint}
+            </Badge>
+          ) : (
+            <span className="text-xs text-muted-foreground">none</span>
+          )}
+        </div>
+        <Link
+          to={`/product/${product.product_id}`}
+          className="brutal-press border-2 border-ink bg-brutal-blue px-3 py-1.5 text-[11px] font-black tracking-wide text-foreground uppercase shadow-[2px_2px_0_0_#111] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+        >
+          Details →
+        </Link>
       </CardFooter>
     </Card>
   );

@@ -4,6 +4,17 @@ import { queryDatabricks } from "../databricks/sql.js";
 const FALLBACK_SUMMARY = "No summary available for this product.";
 const FALLBACK_NEXT_STEP = "No next step available for this product.";
 
+// ai_gen answers in markdown; the UI renders plain text, so flatten it here.
+function formatInsight(raw: string): string {
+    return raw
+        .replace(/\*\*|__|`/g, "")
+        .replace(/^#{1,6}\s*/gm, "")
+        .replace(/^\s*[-*]\s+/gm, "• ")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+}
+
 function escapeSqlString(value: string): string {
     return value.replaceAll("'", "''");
 }
@@ -40,8 +51,8 @@ export async function getProductInsights(productId:string):Promise<{summary:stri
         ]);
         
         return {
-            summary: summaryRows[0]?.summary ?? FALLBACK_SUMMARY,
-            nextStep: nextStepRows[0]?.next_step ?? FALLBACK_NEXT_STEP
+            summary: formatInsight(summaryRows[0]?.summary ?? FALLBACK_SUMMARY),
+            nextStep: formatInsight(nextStepRows[0]?.next_step ?? FALLBACK_NEXT_STEP)
         }
 
     } catch (error)  {

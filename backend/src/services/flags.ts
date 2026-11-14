@@ -13,7 +13,7 @@ export async function isProductFlagged(productId: string): Promise<boolean> {
 export async function setProductFlagged(productId: string, flagged: boolean): Promise<boolean> {
      await pool.query(
         `INSERT INTO product_flags (product_id, flagged) VALUES ($1, $2)
-         ON CONFLICT (product_id) DO UPDATE SET flagged = EXCLUDED.flagged, updated_at = NOW()`,
+         ON CONFLICT (product_id) DO UPDATE SET flagged = EXCLUDED.flagged, updatedat = NOW()`,
         [productId, flagged]
     );
     return flagged;

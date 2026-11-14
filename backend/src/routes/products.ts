@@ -2,7 +2,7 @@ import { Router } from "express";
 import { queryDatabricks } from "../databricks/sql.js";
 import { env } from "../config.js";
 import { computeHealthStatus, healthLabel } from "../health/rules.js";
-import { isProductFlagged, setProductFlagged } from "../services/flags.js";
+import { getFlaggedProductIds, isProductFlagged, setProductFlagged } from "../services/flags.js";
 import { getProductInsights } from "../services/brief.js";
 
 const CATALOG = env.DATABASE_CATALOG;
@@ -53,7 +53,8 @@ const METRICS_SUBQUERY = `
 
 productsRouter.get("/", async (_req, res) => {
     try {
-        const products = await queryDatabricks<ProductListRow>(`
+        const [products, flaggedIds] = await Promise.all([
+          queryDatabricks<ProductListRow>(`
              SELECT
         product.product_id,
         product.name,
@@ -76,10 +77,16 @@ productsRouter.get("/", async (_req, res) => {
             
             
             
-            `);
+            `),
+          getFlaggedProductIds(),
+        ]);
 
    res.status(200).json({
-      products: products.map((row) => ({ ...row, ...buildProductMetrics(row) })),
+      products: products.map((row) => ({
+        ...row,
+        ...buildProductMetrics(row),
+        flagged: flaggedIds.has(String(row.product_id)),
+      })),
     });
 
     } catch (error) {

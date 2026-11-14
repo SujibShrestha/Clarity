@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
-import { ArrowsClockwiseIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import {
+  ArrowsClockwiseIcon,
+  FlagBannerIcon,
+  MagnifyingGlassIcon,
+} from "@phosphor-icons/react";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { Skeleton } from "./components/ui/skeleton";
@@ -9,6 +14,9 @@ import {
   type Product,
 } from "./components/product-card";
 import { useProducts } from "./hooks/use-products";
+import { ProductDetailPage } from "./pages/product-detail";
+
+const EMPTY: Product[] = [];
 
 const STATUS_OPTIONS: { value: HealthStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -18,12 +26,11 @@ const STATUS_OPTIONS: { value: HealthStatus | "all"; label: string }[] = [
   { value: "insufficient_data", label: "Insufficient Data" },
 ];
 
-const EMPTY: Product[] = [];
-
-function App() {
+function ProductList() {
   const { state, reload } = useProducts();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<HealthStatus | "all">("all");
+  const [flaggedOnly, setFlaggedOnly] = useState(false);
 
   const products = state.status === "ready" ? state.products : EMPTY;
 
@@ -36,9 +43,10 @@ function App() {
         (p.top_complaint ?? "").toLowerCase().includes(q) ||
         (p.category ?? "").toLowerCase().includes(q);
       const matchesStatus = status === "all" || p.health.status === status;
-      return matchesQuery && matchesStatus;
+      const matchesFlag = !flaggedOnly || p.flagged;
+      return matchesQuery && matchesStatus && matchesFlag;
     });
-  }, [products, query, status]);
+  }, [products, query, status, flaggedOnly]);
 
   return (
     <main className="flex flex-col gap-8 pt-10">
@@ -85,7 +93,11 @@ function App() {
             />
           </div>
 
-          <div role="group" aria-label="Filter by health status" className="flex flex-wrap gap-2">
+          <div
+            role="group"
+            aria-label="Filter by health status"
+            className="flex flex-wrap gap-2"
+          >
             {STATUS_OPTIONS.map((opt) => {
               const active = status === opt.value;
               return (
@@ -105,6 +117,24 @@ function App() {
                 </Button>
               );
             })}
+            <Button
+              size="sm"
+              aria-pressed={flaggedOnly}
+              onClick={() => setFlaggedOnly((v) => !v)}
+              className={[
+                "border-2 border-ink px-3 py-4 text-xs font-extrabold tracking-wide uppercase",
+                flaggedOnly
+                  ? "bg-brutal-yellow text-foreground shadow-[2px_2px_0_0_#111]"
+                  : "bg-background text-foreground hover:bg-muted",
+              ].join(" ")}
+            >
+              <FlagBannerIcon
+                weight="bold"
+                className="size-3.5"
+                aria-hidden="true"
+              />
+              Flagged
+            </Button>
           </div>
         </section>
       )}
@@ -162,12 +192,13 @@ function App() {
             <div className="brutal bg-card p-8 text-center">
               <h2 className="text-xl">No matches</h2>
               <p className="mt-2 text-sm text-muted-foreground">
-                Nothing matches “{query.trim()}” with the current status filter.
+                Nothing matches the current search and filters.
               </p>
               <Button
                 onClick={() => {
                   setQuery("");
                   setStatus("all");
+                  setFlaggedOnly(false);
                 }}
                 className="brutal-press mt-4 border-[3px] border-ink bg-brutal-yellow px-4 py-5 text-sm font-extrabold tracking-wide text-foreground uppercase shadow-brutal hover:bg-brutal-yellow/80"
               >
@@ -176,7 +207,7 @@ function App() {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {visible.map((product: Product) => (
+              {visible.map((product) => (
                 <ProductCard key={product.product_id} product={product} />
               ))}
             </div>
@@ -184,6 +215,16 @@ function App() {
         </>
       )}
     </main>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<ProductList />} />
+      <Route path="/product/:productId" element={<ProductDetailPage />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
