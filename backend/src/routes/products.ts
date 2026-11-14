@@ -2,6 +2,8 @@ import { Router } from "express";
 import { queryDatabricks } from "../databricks/sql.js";
 import { env } from "../config.js";
 import { computeHealthStatus, healthLabel } from "../health/rules.js";
+import { isProductFlagged, setProductFlagged } from "../services/flags.js";
+import { getProductInsights } from "../services/brief.js";
 
 const CATALOG = env.DATABASE_CATALOG;
 
@@ -91,7 +93,7 @@ productsRouter.get("/", async (_req, res) => {
 productsRouter.get("/:productId", async (req, res) => {
   const { productId } = req.params;
   try {
-      const [productRows, metricsRows, categoryRows, sentimentRows,worstNegativeReview ,bestPositiveReview] = await Promise.all([
+      const [productRows, metricsRows, categoryRows, sentimentRows,worstNegativeReview ,bestPositiveReview, flagged , productInsights] = await Promise.all([
         queryDatabricks(`
           SELECT product_id, name, category
           FROM ${CATALOG}.core.products 
@@ -137,6 +139,8 @@ productsRouter.get("/:productId", async (req, res) => {
           ORDER BY review.rating DESC
           LIMIT 1
           `),
+          isProductFlagged(productId),
+          getProductInsights(productId)
       ]
     
 
@@ -157,6 +161,9 @@ productsRouter.get("/:productId", async (req, res) => {
       category : productRow.category,
       metrics,
       health,
+      flagged,
+      summary : productInsights.summary,
+      nextStep : productInsights.nextStep,
       highlightReview:highlightReviewRow?{
         text:highlightReviewRow.text,
         rating:highlightReviewRow.rating,
@@ -200,3 +207,18 @@ function parseComplaintCategory(
   const category = candidate.trim();
   return category.length > 0 ? category : null;
 }
+
+
+productsRouter.put("/:productId/flag", async (req, res) => {
+   const { productId } = req.params;
+  const  flagged  =Boolean(req.body?.flagged);
+  try {
+    const updatedFlag = await setProductFlagged(productId, flagged); 
+    res.json({productId, flagged: updatedFlag});
+
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update product flag";
+    res.status(500).json({ error: message });
+  }
+});
